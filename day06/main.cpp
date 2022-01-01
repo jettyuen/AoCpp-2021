@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -13,13 +14,18 @@ std::string addDigitString(const std::string &str1, const std::string &str2);
 int main(int argc, char **argv) {
   if (argc == 1) {
     std::cerr << "Pass puzzle input as program argument!" << std::endl;
+    return 0;
   }
   std::map<int, std::string> lanternFish{{0, "0"}, {1, "0"}, {2, "0"},
                                          {3, "0"}, {4, "0"}, {5, "0"},
                                          {6, "0"}, {7, "0"}, {8, "0"}};
   getInput(argv[1], lanternFish);
-  std::cout << addDigitString("99", "3") << std::endl;
+  auto start = std::chrono::high_resolution_clock::now();
   std::cout << "Population: " << simulate(256, lanternFish) << std::endl;
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << "Program took " << duration.count() << " milliseconds" <<
+    std::endl;
   return 0;
 }
 
