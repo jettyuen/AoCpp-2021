@@ -1,16 +1,16 @@
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <vector>
-#include <chrono>
 
 void getInput(const std::string &fileName, std::vector<int> &positions);
 int getFuel(std::vector<int> &positions);
 int getMedian(std::vector<int> &positions);
-int getTriangularMedian(std::vector<int> &positions);
+int getTriangularFuel(std::vector<int> &positions);
 
 int main(int argc, char **argv) {
   if (argc == 1) {
@@ -20,13 +20,13 @@ int main(int argc, char **argv) {
   auto start = std::chrono::high_resolution_clock::now();
   std::vector<int> positions{};
   getInput(argv[1], positions);
-    std::cout << "Fuel cost (Linear): " << getFuel(positions) << std::endl;
-  std::cout << "Fuel cost (Triangular): " << getTriangularMedian(positions)
+  std::cout << "Fuel cost (Linear): " << getFuel(positions) << std::endl;
+  std::cout << "Fuel cost (Triangular): " << getTriangularFuel(positions)
             << std::endl;
   auto end = std::chrono::high_resolution_clock::now();
   auto duration = duration_cast<std::chrono::milliseconds>(end - start);
-  std::cout << "Program took " << duration.count() << " milliseconds" <<
-            std::endl;
+  std::cout << "Program took " << duration.count() << " milliseconds"
+            << std::endl;
   return 0;
 }
 
@@ -60,7 +60,7 @@ int getMedian(std::vector<int> &positions) {
   std::sort(positions.begin(), positions.end());
   return positions[positions.size() / 2];
 }
-int getTriangularMedian(std::vector<int> &positions) {
+int getTriangularFuel(std::vector<int> &positions) {
   std::sort(positions.begin(), positions.end());
   std::map<int, int> distMap{};
   int min{positions[0]}, max{positions[positions.size() - 1]};
