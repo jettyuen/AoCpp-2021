@@ -87,5 +87,6 @@ int main(int argc, char **argv) {
   getInput(argv[1], nums);
   processData(nums, edges, hByN);
   Graph graph{hByN, edges};
+
   return 0;
 }
