@@ -46,7 +46,7 @@ void processData(const std::vector<std::vector<int>> &nums,
       if (i < row.size() - 1) {
         edges.emplace_back(x, x + 1);
       }
-      if (y < nums.size() - 1) {
+      if (y < nums.size()) {
         edges.emplace_back(x, i + (y * 10));
       }
       nodes.emplace(x, num);
@@ -65,9 +65,7 @@ void getInput(const std::string &fileName,
 
   int i{0};
   while (std::getline(ifs, line)) {
-    int num;
-    nums.emplace_back();
-    for (auto &c: line) {
+    int num; nums.emplace_back(); for (auto &c: line) {
       num = c - '0';
       nums[i].push_back(num);
     }
