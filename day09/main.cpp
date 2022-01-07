@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -15,6 +16,25 @@ class Graph {
     int height;
     std::set<int> neighbors;
   };
+
+  int getRiskLevel() {
+    std::vector<int> lowPoints = getLowPoints();
+    int sum{0};
+    for (auto &lowPoint: lowPoints) {
+      sum += _nodeMap[lowPoint].height + 1;
+    }
+    return sum;
+  }
+  int getLargestBasins() {
+    std::vector<std::set<int>> basins = getBasins(getLowPoints());
+    std::sort(
+      basins.begin(), basins.end(),
+      [](const auto &lhs, const auto &rhs) { return lhs.size() > rhs.size(); });
+    int basin1 = (int) basins[0].size();
+    int basin2 = (int) basins[1].size();
+    int basin3 = (int) basins[2].size();
+    return basin1 * basin2 * basin3;
+  }
 
   private:
   std::map<int, Node> _nodeMap;
@@ -35,6 +55,57 @@ class Graph {
       _nodeMap[n1].neighbors.emplace(n2);
     }
   }
+  void dfsRemove(const int &nodeVal, std::set<int> &searched) {
+    Node node = _nodeMap[nodeVal];
+    for (auto &neighbor: node.neighbors) {
+      if (_nodeMap[neighbor].height > node.height) {
+        searched.emplace(neighbor);
+        dfsRemove(neighbor, searched);
+      }
+    }
+  }
+  void dfsAdd(const int &nodeVal, std::set<int> &basin) {
+    Node node = _nodeMap[nodeVal];
+    for (auto &neighbor: node.neighbors) {
+      if (_nodeMap[neighbor].height != 9 && !basin.contains(neighbor)) {
+        basin.emplace(neighbor);
+        dfsAdd(neighbor, basin);
+      }
+    }
+  }
+  std::vector<int> getLowPoints() {
+    std::vector<int> lowPoints{};
+    std::set<int> searched{};
+    for (auto &keyValue: _nodeMap) {
+      if (searched.contains(keyValue.first)) {
+        continue;
+      }
+      Node node = keyValue.second;
+      bool isLowPoint{false};
+      for (auto &neighbor: node.neighbors) {
+        if (_nodeMap[neighbor].height <= node.height) {
+          isLowPoint = false;
+
+          break;
+        } else {
+          isLowPoint = true;
+        }
+      }
+      if (isLowPoint) {
+        lowPoints.push_back(keyValue.first);
+        dfsRemove(keyValue.first, searched);
+      }
+    }
+    return lowPoints;
+  }
+  std::vector<std::set<int>> getBasins(const std::vector<int> &lowPoints) {
+    std::vector<std::set<int>> basins{};
+    for (auto i{0}; i < lowPoints.size(); i++) {
+      basins.emplace_back();
+      dfsAdd(lowPoints[i], basins[i]);
+    }
+    return basins;
+  }
 };
 
 void processData(const std::vector<std::vector<int>> &nums,
@@ -47,7 +118,7 @@ void processData(const std::vector<std::vector<int>> &nums,
         edges.emplace_back(x, x + 1);
       }
       if (y < nums.size()) {
-        edges.emplace_back(x, i + (y * 10));
+        edges.emplace_back(x, i + (y * row.size()));
       }
       nodes.emplace(x, num);
       i++;
@@ -65,7 +136,9 @@ void getInput(const std::string &fileName,
 
   int i{0};
   while (std::getline(ifs, line)) {
-    int num; nums.emplace_back(); for (auto &c: line) {
+    int num;
+    nums.emplace_back();
+    for (auto &c: line) {
       num = c - '0';
       nums[i].push_back(num);
     }
@@ -85,6 +158,7 @@ int main(int argc, char **argv) {
   getInput(argv[1], nums);
   processData(nums, edges, hByN);
   Graph graph{hByN, edges};
-
+  std::cout << "Risk Level: " << graph.getRiskLevel() << std::endl;
+  std::cout << "Basin value: " << graph.getLargestBasins() << std::endl;
   return 0;
 }
