@@ -3,7 +3,7 @@
 #include <map>
 #include <set>
 #include <vector>
-
+#include <chrono>
 #define FLASH_THRESH 9
 
 class Graph {
@@ -24,7 +24,7 @@ class Graph {
         node.second++;
       }
       for (auto &node: _nodes) {
-        if (node.second > 9) {
+        if (node.second > FLASH_THRESH) {
           node.second = 0;
           flashCount++;
           dfsIncrement(node.first, flashCount);
@@ -43,7 +43,7 @@ class Graph {
       }
       int flashDelta{flashCount};
       for (auto &node: _nodes) {
-        if (node.second > 9) {
+        if (node.second > FLASH_THRESH) {
           node.second = 0;
           flashCount++;
           dfsIncrement(node.first, flashCount);
@@ -68,6 +68,7 @@ class Graph {
       addNeighbor(edge.second, edge.first);
     }
   }
+
   void addNeighbor(int n1, int n2) {
     if (_nodeMap.find(n1) == _nodeMap.end()) {
       Node node{_nodes[n1], {n2}};
@@ -81,7 +82,7 @@ class Graph {
     for (auto &neighbor: node.neighbors) {
       if (_nodes[neighbor] != 0) {
         _nodes[neighbor]++;
-        if (_nodes[neighbor] > 9) {
+        if (_nodes[neighbor] > FLASH_THRESH) {
           _nodes[neighbor] = 0;
           flashCount++;
           dfsIncrement(neighbor, flashCount);
@@ -129,6 +130,7 @@ void processInput(const std::vector<std::vector<int>> &nums,
 }
 
 int main(int argc, char **argv) {
+  auto start = std::chrono::high_resolution_clock::now();
   if (argc == 1) {
     std::cerr << "Pass puzzle input as program argument!" << std::endl;
     return 0;
@@ -144,5 +146,9 @@ int main(int argc, char **argv) {
   int steps      = graph1.simulateUntilSync();
   std::cout << "Flash Count: " << flashCount << std::endl;
   std::cout << "All octopuses flashed on step " << steps << std::endl;
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration = duration_cast<std::chrono::milliseconds>(end - start);
+  std::cout << "Program took " << duration.count() << " milliseconds"
+            << std::endl;
   return 0;
 }
