@@ -154,7 +154,7 @@ void getInput(const std::string &fileName,
   std::string line{};
 
   while (std::getline(ifs, line)) {
-    size_t next{0};
+    size_t next;
     size_t last{0};
     while ((next = line.find(delim, last)) != std::string::npos) {
       std::string n1 = line.substr(last, next - last);
